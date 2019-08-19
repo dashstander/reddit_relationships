@@ -4,20 +4,26 @@ library(purrr)
 library(readr)
 library(stringr)
 
-read_data <- function(fp, ...) {
+read_data <- function(fp, columns) {
   print(fp)
-  read_csv(fp) %>% select(...)
+  df = read_csv(fp)
+  if (length(columns) > 0) {
+    df[, columns]
+  } else {
+    df
+  }
 }
 
 
-read_all_data <- function(stage=c('raw', 'clean'), min_year=2010, ...) {
+read_all_data <- function(stage=c('raw', 'clean'), min_year=2010, columns=c()) {
   stage = match.arg(stage)
   
   files <- list.files(sprintf('./data/%s', stage), full.names = TRUE)
   
   years <- as.numeric(str_match(files, '(201[0-9]).csv$')[, 2])
   
-  dplyr::bind_rows(lapply(files[years>=min_year], function(x) read_data(x, ...)))
+  dplyr::bind_rows(map(files[years >= min_year],
+                       ~read_data(.x, columns)))
 }
 
 
