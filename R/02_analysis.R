@@ -35,7 +35,7 @@ get_partner_ages <- function(df, analysis_gender = c('M', 'F'), queer = FALSE) {
 
 make_summary <- function(df) {
   df <- df %>%
-    mutate(gender = factor(gender) %>%
+    mutate(gender = recode(gender, `F` = "Women", M = 'Men')) %>%
     group_by(gender, age) %>% 
     summarize(n = n(),
               med_partner_age = median(partner_age),
@@ -45,10 +45,7 @@ make_summary <- function(df) {
               top_iqr = quantile(partner_age, 0.75), 
               avg_score = mean(score)) %>% 
     arrange(age)
-    )
-   
-  levels(df$gender) <- c("Women", "Men")
-  
+
   df
 }
 
@@ -59,3 +56,35 @@ queer_ages <- bind_rows(map(c('M', 'F'), ~get_partner_ages(relationships_clean, 
 grouped_ages_queer = make_summary(queer_ages)
 grouped_ages_straight = make_summary(straight_ages)
 
+
+straight_plot <- ggplot(grouped_ages_straight %>% 
+                          filter(age >= 15, age <= 60), 
+                        aes(x = age, 
+                            y = med_partner_age, 
+                            ymin=bottom_iqr,
+                            ymax=top_iqr)) + 
+  geom_point(size=3) + 
+  geom_errorbar() + 
+  geom_abline(slope=1, intercept=0) + 
+  xlim(10, 60) + ylim(10, 60) + 
+  facet_wrap(~gender) + theme_minimal() +
+  labs(x = "Age", y = "Median age of romantic partner", 
+       title = "Why doesn't my [36M] gf [22F] want to settle down?", 
+       subtitle = 'Straight couples in /r/relationships from 2014-2019')
+
+
+queer_plot <- ggplot(grouped_ages_queer %>% 
+                       filter(age >= 15, age <= 60), 
+                     aes(x = age, 
+                         y = med_partner_age, 
+                         ymin=bottom_iqr,
+                         ymax=top_iqr)) + 
+  geom_point(size=3) + 
+  geom_errorbar() + 
+  geom_abline(slope=1, intercept=0) + 
+  xlim(10, 60) + ylim(10, 60) + 
+  facet_wrap(~gender) + theme_minimal() +
+  labs(x = "Age", y = "Median age of romantic partner", 
+       title = "There are not very many older queer couples asking for advice on reddit", 
+       subtitle = 'Queer couples in /r/relationships from 2014-2019')
+queer_plot
