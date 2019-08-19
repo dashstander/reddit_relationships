@@ -15,7 +15,7 @@ relationships_parsed_age_and_gender <- relationships_posts_raw %>%
   filter(link_flair_text %in% relationship_flair_texts) %>% 
   produce_age_and_gender_df() %>% 
   mutate(
-    created_utc = as.Date(created_utc, origin = '1970-01-01'),
+    created_utc = as_datetime(created_utc, origin = '1970-01-01'),
     is_queer = younger_partner_gender == older_partner_gender,
     age_diff = older_partner_age - younger_partner_age)
 
