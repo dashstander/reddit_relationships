@@ -5,7 +5,6 @@ library(readr)
 library(stringr)
 
 read_data <- function(fp, ...) {
-  
   print(fp)
   read_csv(fp) %>% select(...)
 }
