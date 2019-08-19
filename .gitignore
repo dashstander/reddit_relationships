@@ -14,6 +14,8 @@
 # Output files from R CMD check
 /*.Rcheck/
 
+reddit_relationships.Rproj
+
 # RStudio files
 .Rproj.user/
 
@@ -34,3 +36,8 @@ vignettes/*.pdf
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
+.Rproj.user
+
+.DS_Store
+
+data/
