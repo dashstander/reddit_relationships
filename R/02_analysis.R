@@ -12,22 +12,20 @@ get_partner_ages <- function(df, analysis_gender = c('M', 'F'), queer = FALSE) {
   younger <- df_orientation %>% 
     dplyr::filter(younger_partner_gender == analysis_gender) %>% 
     dplyr::rename(
-      flair = link_flair_text,
       gender = younger_partner_gender,
       age = younger_partner_age,
       partner_age = older_partner_age,
       partner_gender = older_partner_gender) %>%
-    dplyr::select(flair, score, age, gender, partner_age, partner_gender)
+    dplyr::select(score, age, gender, partner_age, partner_gender)
   
   older <- df_orientation %>% 
     dplyr::filter(older_partner_gender == analysis_gender) %>%
     dplyr::rename(
-      flair = link_flair_text,
       gender = older_partner_gender,
       age = older_partner_age,
       partner_age = younger_partner_age,
       partner_gender = younger_partner_gender) %>%
-    dplyr::select(flair, score, age, gender, partner_age, partner_gender)
+    dplyr::select(score, age, gender, partner_age, partner_gender)
   
   rbind(younger, older)
 }
@@ -68,17 +66,19 @@ straight_plot <- ggplot(grouped_ages_straight %>%
   geom_abline(slope=1, intercept=0) + 
   xlim(10, 60) + ylim(10, 60) + 
   facet_wrap(~gender) + theme_minimal() +
-  labs(x = "Age", y = "Median age of romantic partner", 
-       title = "Why doesn't my [36M] gf [22F] want to settle down?", 
-       subtitle = 'Straight couples in /r/relationships from 2014-2019')
+  labs(x = "Age (years)", y = "Median age of romantic partner (years)", 
+       title = "Age of men and women vs. age of their partners", 
+       subtitle = 'Straight couples in /r/relationships from 2012-2019',
+       caption = "Source: pushshift.io")
 
 
 queer_plot <- ggplot(grouped_ages_queer %>% 
-                       filter(age >= 15, age <= 60), 
-                     aes(x = age, 
+                       filter(age >= 18, age <= 60), 
+                     aes(x = age,
                          y = med_partner_age, 
                          ymin=bottom_iqr,
-                         ymax=top_iqr)) + 
+                         ymax=top_iqr,
+                         color=gender)) + 
   geom_point(size=3) + 
   geom_errorbar() + 
   geom_abline(slope=1, intercept=0) + 
@@ -86,5 +86,5 @@ queer_plot <- ggplot(grouped_ages_queer %>%
   facet_wrap(~gender) + theme_minimal() +
   labs(x = "Age", y = "Median age of romantic partner", 
        title = "There are not very many older queer couples asking for advice on reddit", 
-       subtitle = 'Queer couples in /r/relationships from 2014-2019')
+       subtitle = 'Queer couples in /r/relationships from 2012-2019')
 queer_plot
